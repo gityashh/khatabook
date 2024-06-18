@@ -10,17 +10,18 @@ const {
   } = require("../middlewares/login-middlewares");
 
 
-router.get('/', (req, res) => {
+router.get('/',redirectIfLogin, (req, res) => {
     res.render('index.ejs', { loggedin: false })
 })
-router.get('/register', (req, res) => {
+router.get('/register',redirectIfLogin, (req, res) => {
     res.render('register.ejs', { loggedin: false })
 })
-router.get('/profile', (req, res) => {
-    res.render('profile.ejs', {
 
-    })
-})
+router.get("/profile", isLoggedIn, async function (req, res) {
+    let user = await userModel
+    .findOne({ username: req.user.username })
+    res.render("profile", { user });
+  });
 
 router.get("/logout", function (req, res) {
     res.cookie("token", "");
@@ -30,20 +31,21 @@ router.get("/logout", function (req, res) {
 router.post('/login',async function (req,res){
     try {
         
-        let {email,password} = req.body;
+        let {username,password} = req.body;
+        console.log(username);
 
-        let user = await userModel.findOne({email}).select("+password");
+        let user = await userModel.findOne({username:username}).select("+password");
         if (!user) return res.send('email or password did not match')
 
         if (process.env.JWT_SECRET) {
             bcrypt.compare(password, user.password, function (err,result) {
                 if (result) {
-                    let token = jwt.sign({email,id: user._id},process.env.JWT_SECRET)
+                    let token = jwt.sign({username,id: user._id},process.env.JWT_SECRET)
                     res.cookie('token',token)
-                    return res.send('logged in')
+                    res.redirect('/profile')
                 }
                 else{
-                    res.send(err.message)
+                    res.send(err)
                 }
             })
         }
@@ -51,7 +53,7 @@ router.post('/login',async function (req,res){
             res.send('no secret key')
         }
     } catch (err) {
-        res.send(err.message)
+        res.send(err)
     }
 })
 
@@ -76,12 +78,12 @@ router.post('/register', async (req, res) => {
                     })
 
                     let token = jwt.sign(
-                        { email, id: createduser._id },
+                        { username, id: createduser._id },
                         process.env.JWT_SECRET
                       );
 
                     res.cookie('token',token)
-                    res.send('signed in')
+                    res.redirect('/profile')
                 })
             })
         }

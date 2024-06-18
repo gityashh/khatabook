@@ -15,7 +15,7 @@ function isLoggedIn(req,res,next){
                 })
             }
             else{
-                res.send('login first')
+                res.redirect("/");
             }
         }
         else{
@@ -31,7 +31,7 @@ function redirectIfLogin(req, res, next) {
     if (req.cookies.token) {
       res.redirect("/profile");
     } else next();
-  }
+}
   
   module.exports.isLoggedIn = isLoggedIn;
   module.exports.redirectIfLogin = redirectIfLogin;
