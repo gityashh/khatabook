@@ -3,6 +3,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="/stylesheets/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -12,8 +13,8 @@
         <% var loggedin=typeof loggedin !=='undefined' ? loggedin : true %>
             <% if(loggedin){ %>
                 <div class="links flex gap-4">
-                    <a href="#">Home</a>
-                    <a href="#">Create new hisaab</a>
+                    <a href="/profile">Home</a>
+                    <a href="/hisaab/create">Create new hisaab</a>
                     <a class="text-red-500" href="/logout">Logout</a>
                 </div>
                 <% } %>

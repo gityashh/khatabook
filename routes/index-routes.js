@@ -18,8 +18,20 @@ router.get('/register',redirectIfLogin, (req, res) => {
 })
 
 router.get("/profile", isLoggedIn, async function (req, res) {
+    let {byDate,startDate,endDate} = req.query;
+    
+    byDate = Number(byDate ? byDate : -1)
+    startDate = startDate ? startDate : "1970-01-01"
+    endDate = endDate ? endDate : new Date()
+
     let user = await userModel
     .findOne({ username: req.user.username })
+    .populate({
+        path:"hisaab",
+        match: { createdAt: { $gte: startDate, $lte: endDate } },
+        options: {sort:{createdAt: byDate}}
+    })
+
     res.render("profile", { user });
   });
 
@@ -32,7 +44,6 @@ router.post('/login',async function (req,res){
     try {
         
         let {username,password} = req.body;
-        console.log(username);
 
         let user = await userModel.findOne({username:username}).select("+password");
         if (!user) return res.send('email or password did not match')
@@ -45,7 +56,7 @@ router.post('/login',async function (req,res){
                     res.redirect('/profile')
                 }
                 else{
-                    res.send(err)
+                    res.send('email or password did not match')
                 }
             })
         }

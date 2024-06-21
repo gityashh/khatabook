@@ -10,7 +10,8 @@ function isLoggedIn(req,res,next){
                         next();
                     }
                     else{
-                        res.send('login first')
+                        res.cookie("token","")
+                        res.redirect('/')
                     }
                 })
             }
